@@ -1,6 +1,3 @@
-const Discord = require('discord.js');
-var fs = require('fs');
-var Logging = require('./logging.js');
 var bannedUsers = {};
 
 module.exports = {
