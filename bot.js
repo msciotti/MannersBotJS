@@ -11,20 +11,12 @@ bot.on('ready', () => {
     console.log('I am ready to make your server a better place!')
 });
 
-bot.on('disconnect', () => {
-    fs.writeFile('bannedUsers.json', bannedUsers, 'utf8', function(err, data) {
-        if(err) { console.log(err); }
-        else { console.log('Saved banned user states.'); }      
-    });
-})
-
 bot.on('message', message => {
     if(message.channel.type != "dm") {
         if(!Punishment.checkPermissions(message.member)){
             if(Punishment.checkProfanity(message.content, bannedWords)){
                 message.delete()
-                .then(msg => {
-                    Logging.logMessageDelete(bot, message);
+                .then(msg => {                    
                     Punishment.doleOutPunishment(bot, msg.member, msg.guild);
                 })
             }
@@ -38,6 +30,10 @@ bot.on('messageDelete', message => {
 
 bot.on('messageUpdate', (oldMessage, newMessage) => {
     Logging.logMessageUpdate(bot, oldMessage, newMessage);
+})
+
+bot.on('guildBanAdd', (guild, user) =>{
+    Logging.logUserBan(bot, user, guild);
 })
 
 bot.login(settings['BOT_LOGIN_TOKEN']);

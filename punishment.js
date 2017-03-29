@@ -21,8 +21,7 @@ module.exports = {
     },
 
     banUser: function(bot, member, guild) {
-        member.user.dmChannel.sendMessage('You have been banned for posting profanity.')
-        Logging.logUserBan(bot, member.user, guild);
+        member.user.dmChannel.sendMessage('You have been banned for posting profanity.')              
         member.ban(7);
     },
 
