@@ -1,0 +1,15 @@
+{
+  "name": "mannersbotjs",
+  "version": "1.0.0",
+  "description": "A Discord bot to moderate chat and keep people friendly",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mason Sciotti",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.0.0",
+    "node-fetch": "^1.6.3"
+  }
+}
