@@ -1,6 +1,6 @@
 module.exports = {
     logUserBan: function(bot, user, guild) {
-        this.getLoggingChannel(message.guild, function(loggingChannel) {
+        this.getLoggingChannel(guild, function(loggingChannel) {
             loggingChannel.sendMessage(`:skull: **User Banned** :skull:
                                        \n**User**: ${user.username}`);   
         });            
@@ -25,15 +25,27 @@ module.exports = {
 
     getLoggingChannel: function(guild, callback){                
         var loggingChannel = guild.channels.find('name', 'mannersbot-logging');
-        var override = {
-            id: guild.id,
-            type: 'role',
-            allow: 1024,
-            deny: 2048
-        };
-        
-        if(loggingChannel == null){                        
-            guild.createChannel('mannersbot-logging', 'text', [override])
+                
+        if(loggingChannel == null){
+            var plebRoles = guild.roles.filter(x => x.hasPermission('MANAGE_MESSAGES'));
+            var roleArray = [];
+            for(var role of plebRoles){
+                var override = {
+                    id: role[0],
+                    type: 'role',
+                    allow: 1024,
+                    deny: 2048
+                };
+                roleArray.push(override);
+            }
+            roleArray.push({
+                id: guild.id,
+                type: 'role',
+                deny: 3072
+            });
+
+            console.log(roleArray);
+            guild.createChannel('mannersbot-logging', 'text', roleArray)
             .then(newChannel => callback(newChannel))
             .catch(console.error);
         }
