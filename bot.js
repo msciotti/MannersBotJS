@@ -6,11 +6,9 @@ const Discord = require('discord.js');
 const settings = require('./settings.json');
 const bot = new Discord.Client();
 var bannedWords = Initialize.loadBannedWords();
-var bannedUsers = require('./bannedUsers.json');
 
 bot.on('ready', () => {
     console.log('I am ready to make your server a better place!')
-    Logging.checkForLoggingChannel(bot);    
 });
 
 bot.on('disconnect', () => {
@@ -25,10 +23,21 @@ bot.on('message', message => {
         if(!Punishment.checkPermissions(message.member)){
             if(Punishment.checkProfanity(message.content, bannedWords)){
                 message.delete()
-                .then(msg => Punishment.doleOutPunishment(bot, msg.member, msg.guild, bannedUsers))
+                .then(msg => {
+                    Logging.logMessageDelete(bot, message);
+                    Punishment.doleOutPunishment(bot, msg.member, msg.guild);
+                })
             }
         } 
     }      
 });
+
+bot.on('messageDelete', message => {
+    Logging.logMessageDelete(bot, message);
+})
+
+bot.on('messageUpdate', (oldMessage, newMessage) => {
+    Logging.logMessageUpdate(bot, oldMessage, newMessage);
+})
 
 bot.login(settings['BOT_LOGIN_TOKEN']);

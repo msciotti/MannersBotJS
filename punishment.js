@@ -1,33 +1,38 @@
 const Discord = require('discord.js');
+var fs = require('fs');
+var Logging = require('./logging.js');
+var bannedUsers = {};
 
 module.exports = {
-    doleOutPunishment: function(bot, member, guild, bannedUsers) {
-        if(bannedUsers[guild.id] == null){
-            bannedUsers[guild.id] = [];
+    doleOutPunishment: function(bot, member, guild) {
+        if(bannedUsers[guild.id] == null){            
+            bannedUsers[guild.id] = [];                 
         }
 
-        if(bannedUsers[guild.id].indexOf(member.id) > -1) {
-            this.banUser(member, bannedUsers[guild.id]);
+        var index = bannedUsers[guild.id].indexOf(member.id);        
+        if(index > -1) {
+            bannedUsers[guild.id].splice(index, 1);
+            this.banUser(bot, member, guild)
         }
         else {
-            this.warnUser(bot, member, bannedUsers[guild.id]);
-        }
+            bannedUsers[guild.id].push(member.id);
+            this.warnUser(bot, member);
+        }                     
     },
 
-    banUser: function(member, bannedUsers) {
-        member.ban(7);
+    banUser: function(bot, member, guild) {
         member.user.dmChannel.sendMessage('You have been banned for posting profanity.')
-        delete bannedUsers[member.id];
+        Logging.logUserBan(bot, member.user, guild);
+        member.ban(7);
     },
 
-    warnUser: function(bot, member, bannedUsers) {    
-        bannedUsers.push(member.id);
+    warnUser: function(bot, member) {    
         bot.fetchUser(member.id)
-        .then(user => user.sendMessage('Your message has been deleted for profanity and logged. Another infraction will automatically trigger a ban from the server.'))   
+        .then(user => user.sendMessage('Your message has been deleted for profanity and logged.'))   
     },
 
     checkPermissions: function(member) {    
-        return member.hasPermission("MANAGE_MESSAGES", true);        
+        return member.hasPermission("MANAGE_MESSAGES", false);        
     },
 
     checkProfanity: function(message, bannedWords) {
@@ -37,5 +42,5 @@ module.exports = {
                 return true;
         }
         return false;
-    }
+    }              
 }
